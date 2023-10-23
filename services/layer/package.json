@@ -1,0 +1,33 @@
+{
+   "name": "services",
+   "version": "1.0.0",
+   "description": "",
+   "main": "postCatalog.js",
+   "scripts": {
+      "deploy": "serverless deploy",
+      "build": "serverless package",
+      "check": "serverless doctor",
+      "info": "serverless info --verbose",
+      "test": "echo \"Error: no test specified\" && exit 1"
+   },
+   "author": "",
+   "license": "ISC",
+   "dependencies": {
+      "@aws-sdk/client-apigatewaymanagementapi": "^3.425.0",
+      "@aws-sdk/client-dynamodb": "^3.391.0",
+      "@aws-sdk/client-sqs": "^3.414.0",
+      "@aws-sdk/client-ssm": "^3.391.0",
+      "@aws-sdk/client-textract": "^3.391.0",
+      "@aws-sdk/cloudfront-signer": "^3.391.0",
+      "@aws-sdk/lib-dynamodb": "^3.391.0",
+      "@aws-sdk/util-dynamodb": "^3.391.0",
+      "aws-sdk": "^2.1437.0",
+      "crypto": "^1.0.1",
+      "moment": "^2.29.4",
+      "pg": "^8.11.2",
+      "pg-hstore": "^2.3.4",
+      "salted-md5": "^4.0.5",
+      "sequelize": "^6.32.1",
+      "yup": "^1.2.0"
+   }
+}
