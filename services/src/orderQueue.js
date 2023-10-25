@@ -13,6 +13,7 @@ module.exports.handler = async (event) => {
          return buildResponse(400, "Bad Request!", null);
       }
 
+      const body = JSON.parse(event.body);
       const rawData = {
          connectionId: body.connectionId,
          body: body.data
