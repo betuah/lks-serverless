@@ -26,7 +26,9 @@ module.exports.handler = async (event) => {
             } while (jobStatus === "IN_PROGRESS");
             
             const { Blocks } = await getTextDetectionResults(jobId);
-            console.log("Text detection completed. Results:", JSON.stringify(Blocks));
+            const amount = getAmount(Blocks);
+            console.log("Text detection completed.");
+            console.log(`Tranffer amount : ${amount}`);
          } catch (error) {
             console.error("Error processing message:", error);
          }
@@ -57,4 +59,14 @@ const getTextDetectionResults = async (jobId) => {
             
    const { JobStatus, Blocks } = await textractClient.send(getCommand);
    return { JobStatus, Blocks};
+};
+
+const getAmount = (blocks) => {
+  const amountBlock = blocks.find((block) => block.BlockType === "LINE" && block.Text && block.Text.includes("Rp"));
+
+  if (amountBlock) {
+    return amountBlock.Text;
+  }
+
+  return null;
 };
