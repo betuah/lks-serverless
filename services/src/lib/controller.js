@@ -4,6 +4,11 @@ const { buildResponse, randomNumber } = require("/opt/utilities");
 const { initDatabase } = require("./connection");
 const { eventSchema, orderSchema, ticketSchema } = require("./validation");
 
+const apiGateway = new ApiGatewayManagementApiClient({
+   apiVersion: '2018-11-29',
+   endpoint: `https://${process.env.WEBSOCKET_ID}.execute-api.us-east-1.amazonaws.com/dev`, // Retrieve the API endpoint from environment variables
+});
+
 const getEvent = async () => {
    try {
       const { Event } = await initDatabase();
@@ -120,7 +125,7 @@ const removeEvent = async (id) => {
             `Event with id ${id} is not found!`
          );
       } else {
-         await Event.destroy({ where: { id } });
+         await Event.destroy({ where: { eventId: id } });
          return buildResponse(200, "Remove event success!", null);
       }
    } catch (error) {
@@ -163,18 +168,17 @@ const removeTicket = async (id) => {
    try {
       const { Ticket } = await initDatabase();
       const data = await Ticket.findByPk(id);
-
-      if (!data) {
-         return buildResponse(
-            404,
-            `Ticket with id ${id} is not found!`
-         );
-      } else {
-         await Ticket.destroy({ where: { id } });
+      
+      if (data) {
+         const res = await Ticket.destroy({ where: { ticketId: id } });
+         
+         console.log(res, "asdasdzxczxczsd")
          return buildResponse(200, "Remove ticket success!", null);
+      } else {
+         return buildResponse(400, `Ticket with id ${id} is not found!`);
       }
    } catch (error) {
-      console.error(`Remove ticket error : ${error}`);
+      console.log(`Remove ticket error : ${error}`);
       return buildResponse(500, "Remove ticket error!", null);
    }
 };
@@ -215,11 +219,6 @@ const getOrder = async () => {
 
 const createOrder = async (message, sqsUrl) => {
    try {
-      const apiGateway = new ApiGatewayManagementApiClient({
-         apiVersion: '2018-11-29',
-         endpoint: `https://${process.env.WEBSOCKET_ID}.execute-api.us-east-1.amazonaws.com/dev`, // Retrieve the API endpoint from environment variables
-      });
-
       const sqsClient = new SQSClient({ region: "us-east-1" });
       const { connectionId, body} = JSON.parse(message.body);
       const { sequelize, Ticket, Order, OrderDetail, Payment } = await initDatabase();
@@ -270,8 +269,10 @@ const createOrder = async (message, sqsUrl) => {
          
          await sendMessage(connectionId, {
             connectionId,
-            message: "OK"
-         })
+            status: "OK"
+         });
+
+         console.log("message was send to", connectionId);
 
          return { success: true, error: null };
       } catch (error) {
@@ -304,6 +305,6 @@ const sendMessage = async (targetId, message) => {
    } catch (error) {
       console.log(`SendMessage error : ${error}`);
    }
-}
+};
 
 module.exports = { getEvent, getEventById, getOrder, createEvent, createTicket, createOrder, updateEvent, removeEvent, removeTicket };
