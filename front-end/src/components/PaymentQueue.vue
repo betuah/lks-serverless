@@ -49,10 +49,15 @@ watch(() => props.modelValue, (val) => {
 });
 
 const submit = async () => {
-   loading.value = true
-   const filename = file.value[0].name
-   const ext = filename.split('.')[1]
-   const type = file.value[0].type
+   loading.value = true;
+   const type = file.value[0].type;
+   let ext = 'jpg';
+
+   if (type === 'image/jpeg') {
+      ext = 'jpg';
+   } else if (type === 'image/png') {
+      ext = 'png';
+   }
 
    try {
       const res = await orderStore.uploadPayment(base64Image.value, ext, type);
@@ -72,14 +77,14 @@ const submit = async () => {
    }
 }
 
-const handleFileUpload = () => {
-   convertToBase64(file.value[0]);
+const handleFileUpload = (e) => {
+   convertToBase64(e.target.files[0]);
 };
 
 const convertToBase64 = (file) => {
    const reader = new FileReader();
-   reader.onload = () => {
-      base64Image.value = reader.result;
+   reader.onload = (e) => {
+      base64Image.value = e.target.result;
    };
    reader.readAsDataURL(file);
 };

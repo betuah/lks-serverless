@@ -44,7 +44,6 @@ const to = (path) => {
                <VList class="d-flex flex-row justify-end align-center">
                   <VListItem :active="active.value == 1" rounded="lg" variant="plain" @click="to('/')" class="font-weight-medium">Home</VListItem>
                   <VListItem :active="active.value == 2" rounded="lg" variant="plain" @click="to('/about')" class="font-weight-medium">About</VListItem>
-                  <VListItem :active="active.value == 3" rounded="lg" variant="plain" @click="to('#contact')" class="font-weight-medium text-sm">Proof Of Payment</VListItem>
                </VList>
                <NavbarThemeSwitcher class="d-none d-md-flex" />
             </div>
