@@ -33,11 +33,16 @@ export const useOrderStore = defineStore("orderStore", {
             notifStore.setSnackbar("error", message, true);
          }
       },
-      async uploadPayment(image, format) {
+      async uploadPayment(image, format, type) {
          const notifStore = useNotifStore();
+         const customHeaders = {
+            Authorization: headers.Authorization,
+            Deviceid: headers.Deviceid,
+            "Content-Type": `${type}`,
+         };
 
          try {
-            const response = await axios.put(`${api_url}/payment/${new Date().getTime()}.${format}`, { image } , { headers });
+            const response = await axios.put(`${api_url}/payment/${new Date().getTime()}.${format}`, { image } , { headers: customHeaders });
             const httpStatus = response.status;
             if (httpStatus === 200) {
                return true

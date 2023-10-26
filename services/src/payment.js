@@ -1,14 +1,11 @@
 const { TextractClient, StartDocumentTextDetectionCommand, GetDocumentTextDetectionCommand } = require("/opt/node_modules/@aws-sdk/client-textract");
-const { ApiGatewayManagementApiClient, PostToConnectionCommand } = require("/opt/node_modules/@aws-sdk/client-apigatewaymanagementapi");
+const { SQSClient, DeleteMessageCommand } = require("/opt/node_modules/@aws-sdk/client-sqs");
 const { buildResponse } = require("/opt/utilities");
 
 const region = "us-east-1";
 const textractClient = new TextractClient({ region });
-
-const apiGateway = new ApiGatewayManagementApiClient({
-   apiVersion: '2018-11-29',
-   endpoint: `https://${process.env.WEBSOCKET_ID}.execute-api.us-east-1.amazonaws.com/dev`, // Retrieve the API endpoint from environment variables
-});
+const sqsClient = new SQSClient({ region: "us-east-1" });
+const sqsUrl = process.env.SQS_QUEUE_URL;
 
 module.exports.handler = async (event) => {
    const Messages = event.Records;
@@ -17,7 +14,7 @@ module.exports.handler = async (event) => {
       // Message proccessing
       for (const message of Messages) {
          try {
-            const { bucketName, key, connectionId } = JSON.parse(message.body);
+            const { bucketName, key } = JSON.parse(message.body);
             console.log(`Get image from S3: ${bucketName}/${key}`);
             
             const jobId = await startTextDetection(bucketName, key);
@@ -25,22 +22,19 @@ module.exports.handler = async (event) => {
             
             let jobStatus;
             do {
-              await new Promise((resolve) => setTimeout(resolve, 5000)); // Wait for 5 seconds before checking again
-              const { JobStatus } = await getTextDetectionResults(jobId);
-              console.log(`Scanning status: ${JobStatus}`);
-              jobStatus = JobStatus;
+               await new Promise((resolve) => setTimeout(resolve, 5000)); // Wait for 5 seconds before checking again
+               const { JobStatus } = await getTextDetectionResults(jobId);
+               console.log(`Scanning status: ${JobStatus}`);
+               jobStatus = JobStatus;
             } while (jobStatus === "IN_PROGRESS");
             
             const { Blocks } = await getTextDetectionResults(jobId);
             const amount = getAmount(Blocks);
-            
-            await sendMessage(connectionId, {
-               connectionId,
-               status: "OK"
-            });
-            
             console.log("Text detection completed.");
             console.log(`Tranffer amount : ${amount}`);
+            
+            const deleteMessageCommand = new DeleteMessageCommand({ QueueUrl: sqsUrl, ReceiptHandle: message.receiptHandle });
+            await sqsClient.send(deleteMessageCommand);
          } catch (error) {
             console.error("Error processing message:", error);
          }
@@ -74,25 +68,11 @@ const getTextDetectionResults = async (jobId) => {
 };
 
 const getAmount = (blocks) => {
-  const amountBlock = blocks.find((block) => block.BlockType === "LINE" && block.Text && block.Text.includes("Rp"));
+   const amountBlock = blocks.find((block) => block.BlockType === "LINE" && block.Text && block.Text.includes("Rp"));
 
-  if (amountBlock) {
-    return amountBlock.Text;
-  }
-
-  return null;
-};
-
-const sendMessage = async (targetId, message) => {
-   try {
-      const params = {
-         ConnectionId: targetId,
-         Data: JSON.stringify(message),
-      };
-   
-      const sendCommand = new PostToConnectionCommand(params);
-      await apiGateway.send(sendCommand);
-   } catch (error) {
-      console.log(`SendMessage error : ${error}`);
+   if (amountBlock) {
+      return amountBlock.Text;
    }
+
+   return null;
 };

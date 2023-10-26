@@ -52,9 +52,10 @@ const submit = async () => {
    loading.value = true
    const filename = file.value[0].name
    const ext = filename.split('.')[1]
+   const type = file.value[0].type
 
    try {
-      const res = await orderStore.uploadPayment(base64Image.value, ext);
+      const res = await orderStore.uploadPayment(base64Image.value, ext, type);
       if (res) {
          queue.value = false;
          base64Image.value = null;
