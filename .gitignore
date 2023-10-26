@@ -11,7 +11,7 @@ init_mongo.js
 # services/*.yml
 # services/*.json
 .DS_Store
-
+**yarn.lock
 # Tmp
 ./tmp/*
 
