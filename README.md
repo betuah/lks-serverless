@@ -49,7 +49,7 @@ npm run build
 ## Backend - API Setup (Serverless)
 The root folder for backend projects is **service**.
 #### Lambda Setup
-All dependencies required by each Lambda function are located in the **src/layer** folder and are bundled into a layer with name lks-layer.
+All dependencies required by each Lambda function are located in the **service/layer** folder and are bundled into a layer with name lks-layer.
 
 | Name | Code Source | Environment | Description  |
 |--|--|--|--|
