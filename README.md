@@ -49,7 +49,7 @@ npm run build
 ## Backend - API Setup (Serverless)
 The root folder for backend projects is **service**.
 #### Lambda Setup
-All dependencies required by each Lambda function are located in the **service/layer** folder and are bundled into a layer with name lks-layer.
+All dependencies required by each Lambda function are located in the **service/layer** folder and are bundled into a **layer** with name **lks-layer**, dont forget to attach the layer into lambda function.
 
 | Name | Code Source | Environment | Description  |
 |--|--|--|--|
@@ -64,6 +64,7 @@ All dependencies required by each Lambda function are located in the **service/l
 | **lks-queue-payment** | src/lib, src/paymentQueue.js | SQS_QUEUE_URL | This function is used send S3 metadata to SQS. It uses a maximum of 128MB of memory and has a maximum execution time of 3 seconds. |
 | **lks-payment** | src/lib, src/payment.js | SQS_QUEUE_URL | This function is used as a SQS consumer to process payment. It uses a maximum of 256MB of memory and has a maximum execution time of 10 seconds. |
 | **lks-websocket** | src/websocket.js | - | This function is used handle websocket. It uses a maximum of 256MB of memory and has a maximum execution time of 5 seconds. |
+
 #### API Endpoint
 
 You can check the API endpoint documentation in [here]
