@@ -69,6 +69,10 @@ All dependencies required by each Lambda function are located in the **service/l
 
 You can check the API endpoint documentation in [here]
 
+#### Websocket Setup
+
+The websocket in this project is used to provide asynchronous responses to the front-end when messages on SQS have been successfully processed by the lambda consumer. The websocket has six routes: $connect, $disconnect, $default, sendMessage, getConnectionId, and broadcastMessage. The route selection expression for each route is **$request.body.action**. Each route invokes the lambda function that contains the websocket.js file. Don’t forget to use prod stage as a production stage name. 
+
 ## License
 
 MIT
