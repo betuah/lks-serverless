@@ -231,6 +231,8 @@ const submit = async () => {
             }
          };
 
+         console.log('Connection ID: ', ws.connectionId)
+
          const res = await orderStore.createOrder(rawBody);
          isDialogShow.value = res ? res : false;
       } finally {
